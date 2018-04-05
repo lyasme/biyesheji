@@ -15,12 +15,34 @@ def home(request):
     return render(request,'axf/home.html',{"title":"主页","wheelslist":wheelslist,"navList":navList,"mustbuyList":mustbuyList,"shop1":shop1,"shop1":shop1,"shop2":shop2,"shop3":shop3,"shop4":shop4,"mainList":mainList})
 
 
-def market(request,categoryid):
+def market(request,categoryid,cid,sortid):
     leftSlider=FoodTypes.objects.all()
-    productList=Goods.objects.filter(categoryid=categoryid)
+
+    if cid == '0':
+        productList = Goods.objects.filter(categoryid=categoryid)
+    else:
+        productList = Goods.objects.filter(categoryid=categoryid,childcid=cid)
+        productList = productList.filter(childcid=cid)
+
+    # 排序
+    if sortid == '1':
+        productList = productList.order_by("productnum")
+    elif sortid == '2':
+        productList = productList.order_by("price")
+    elif sortid == '3':
+        productList = productList.order_by("-price")
+
+    group = leftSlider.get(typeid=categoryid)
+    childList = []
+    childnames = group.childtypenames
+    arr1 = childnames.split("#")
+    for str in arr1:
+        arr2 = str.split(":")
+        obj = {"childName":arr2[0],"childId":arr2[1]}
+        childList.append(obj)
 
 
-    return render(request,'axf/market.html',{"title":"闪送超市","leftSlider":leftSlider,"productList":productList})
+    return render(request,'axf/market.html',{"title":"闪送超市","leftSlider":leftSlider,"productList":productList,"childList":childList,"categoryid":categoryid,"cid":cid})
 
 
 def cart(request):
