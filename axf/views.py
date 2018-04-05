@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .models import Wheel,Nav,Mustbuy,Shop,MainShow
+from .models import Wheel,Nav,Mustbuy,Shop,MainShow,FoodTypes,Goods
 # Create your views here.
 
 def home(request):
@@ -16,7 +16,11 @@ def home(request):
 
 
 def market(request):
-    return render(request,'axf/market.html',{"title":"闪送超市"})
+    leftSlider=FoodTypes.objects.all()
+    productList=Goods.objects.all()
+
+
+    return render(request,'axf/market.html',{"title":"闪送超市","leftSlider":leftSlider,"productList":productList})
 
 
 def cart(request):
