@@ -15,9 +15,9 @@ def home(request):
     return render(request,'axf/home.html',{"title":"主页","wheelslist":wheelslist,"navList":navList,"mustbuyList":mustbuyList,"shop1":shop1,"shop1":shop1,"shop2":shop2,"shop3":shop3,"shop4":shop4,"mainList":mainList})
 
 
-def market(request):
+def market(request,categoryid):
     leftSlider=FoodTypes.objects.all()
-    productList=Goods.objects.all()
+    productList=Goods.objects.filter(categoryid=categoryid)
 
 
     return render(request,'axf/market.html',{"title":"闪送超市","leftSlider":leftSlider,"productList":productList})
