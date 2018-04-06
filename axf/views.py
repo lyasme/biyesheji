@@ -208,7 +208,7 @@ def changecart(request,flag):
         product.storenums += 1
         product.save()
         return JsonResponse({"data":c.productnum, "price":c.productprice,"status":"success"})
-    
+
     elif flag == '2':
         carts = Cart.objects.filter(userAccount=user.userAccount)
         c = carts.get(productid=productid)
