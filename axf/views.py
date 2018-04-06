@@ -3,7 +3,7 @@ from django.http import JsonResponse
 from django.shortcuts import render, redirect
 
 from axf.forms.login import LoginForm
-from .models import Wheel, Nav, Mustbuy, Shop, MainShow, FoodTypes, Goods, User
+from .models import Wheel, Nav, Mustbuy, Shop, MainShow, FoodTypes, Goods, User,Cart
 
 
 # Create your views here.
@@ -148,3 +148,71 @@ def checkuserid(request):
         print("**88**8***2")
         return JsonResponse({"data":"可以注册","status":"success"})
 
+# 修改购物车
+def changecart(request,flag):
+    # 判断用户是否登录
+    token = request.session.get("token")
+    if token == None:
+        # 没登录
+        return JsonResponse({"data":-1, "status":"error"})
+
+    productid = request.POST.get("productid")
+    product = Goods.objects.get(productid = productid)
+    user = User.objects.get(userToken = token)
+
+
+    if flag == '0':
+        if product.storenums == 0:
+            return JsonResponse({"data": -2, "status": "error"})
+        carts = Cart.objects.filter(userAccount = user.userAccount)
+        c = None
+        if carts.count() == 0:
+            # 直接增加一条订单
+            c = Cart.createcart(user.userAccount,productid,1,product.price,True,product.productimg,product.productlongname,False)
+            c.save()
+            pass
+        else:
+            try:
+                c = carts.get(productid = productid)
+                #修改数量和价格
+                c.productnum += 1
+                c.productprice = "%.2f"%(float(product.price) * c.productnum)
+                c.save()
+            except Cart.DoesNotExist as e:
+                # 直接增加一条订单
+                c = Cart.createcart(user.userAccount, productid, 1, product.price, True, product.productimg,product.productlongname, False)
+                c.save()
+        #库存减一
+        product.storenums -= 1
+        product.save()
+        return JsonResponse({"data":c.productnum, "price":c.productprice,"status":"success"})
+    elif flag == '1':
+        carts = Cart.objects.filter(userAccount = user.userAccount)
+        c = None
+        if carts.count() == 0:
+            return JsonResponse({"data":-2,"status":"error"})
+        else:
+            try:
+                c = carts.get(productid = productid)
+                #修改数量和价格
+                c.productnum -= 1
+                c.productprice = "%.2f"%(float(product.price) * c.productnum)
+                if c.productnum == 0:
+                    c.delete()
+                else:
+                    c.save()
+            except Cart.DoesNotExist as e:
+                return JsonResponse({"data": -2, "status": "error"})
+        #库存减一
+        product.storenums += 1
+        product.save()
+        return JsonResponse({"data":c.productnum, "price":c.productprice,"status":"success"})
+    elif flag == '2':
+        carts = Cart.objects.filter(userAccount=user.userAccount)
+        c = carts.get(productid=productid)
+        c.isChose = not c.isChose
+        c.save()
+        str = ""
+        if c.isChose:
+            str = "√"
+        return JsonResponse({"data": str, "status": "success"})
