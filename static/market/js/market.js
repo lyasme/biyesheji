@@ -37,12 +37,7 @@ $(document).ready(function(){
             pid = this.getAttribute("ga")
             $.post("/changecart/0/",{"productid":pid}, function(data){
                 if (data.status == "success"){
-                    //添加成功，把中间的span的innerHTML变成当前的数量
-                    document.getElementById(pid).innerHTML = data.data
-                } else {
-                    if (data.data == -1){
-                        window.location.href = "http://127.0.0.1:8001/login/"
-                    }
+                    //添加成功，把中间的span的innerHTML变成当前的数
                 }
             })
         })
@@ -56,11 +51,7 @@ $(document).ready(function(){
             $.post("/changecart/1/",{"productid":pid}, function(data){
                 if (data.status == "success"){
                     //添加成功，把中间的span的innerHTML变成当前的数量
-                    document.getElementById(pid).innerHTML = data.data
-                } else {
-                    if (data.data == -1){
-                        window.location.href = "http://127.0.0.1:8001/login/"
-                    }
+
                 }
             })
         })
