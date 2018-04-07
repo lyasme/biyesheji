@@ -157,4 +157,5 @@ def changecart(request,flag):
         #没登录
         print("******bcnkm")
         return redirect('/login/')
-
+    else:
+        pass
